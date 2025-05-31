@@ -37,16 +37,36 @@ function initSpeechRecognition() {
     
     recognition.onerror = (event) => {
         console.error('خطای تشخیص گفتار:', event.error);
-        updateStatus(`خطا: ${event.error}`, false);
+        
+        // مدیریت خطاهای خاص
+        if (event.error === 'not-allowed') {
+            updateStatus('دسترسی به میکروفون داده نشد', false);
+        } else {
+            updateStatus(`خطا: ${event.error}`, false);
+        }
+        
         // تلاش مجدد پس از خطا
         setTimeout(() => {
-            if (isListening) recognition.start();
-        }, 1000);
+            if (isListening) {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error('خطا در شروع مجدد:', e);
+                }
+            }
+        }, 2000);
     };
     
     recognition.onend = () => {
         if (isListening) {
-            recognition.start(); // شروع مجدد گوش دادن
+            // شروع مجدد گوش دادن
+            setTimeout(() => {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error('خطا در شروع مجدد:', e);
+                }
+            }, 500);
         }
     };
     
@@ -57,21 +77,24 @@ function initSpeechRecognition() {
         processVoiceCommand(transcript);
     };
     
-    // درخواست مجوز میکروفون و شروع تشخیص گفتار
-    requestMicrophonePermission();
+    // شروع تشخیص گفتار با تأخیر برای اجازه دادن به تعامل کاربر
+    setTimeout(() => {
+        startRecognition();
+    }, 1000);
 }
 
-// درخواست دسترسی به میکروفون
-function requestMicrophonePermission() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(() => {
-            recognition.start();
-        })
-        .catch(err => {
-            console.error('خطای دسترسی به میکروفون:', err);
-            updateStatus('دسترسی به میکروفون داده نشد', false);
-            micStatus.style.backgroundColor = '#ff4757';
-        });
+// شروع تشخیص گفتار
+function startRecognition() {
+    try {
+        recognition.start();
+        updateStatus('در حال راه‌اندازی...', false);
+    } catch (e) {
+        console.error('خطا در شروع تشخیص گفتار:', e);
+        updateStatus('خطا در شروع تشخیص گفتار', false);
+        
+        // تلاش مجدد
+        setTimeout(startRecognition, 2000);
+    }
 }
 
 // پردازش دستورات صوتی
@@ -145,7 +168,7 @@ function logCommand(command) {
 function highlightCommand(cmd) {
     const commands = document.querySelectorAll('.instructions li');
     commands.forEach(li => {
-        if (li.textContent.includes(cmd)) {
+        if (li.textContent.toLowerCase().includes(cmd)) {
             li.classList.add('highlight');
             setTimeout(() => li.classList.remove('highlight'), 1500);
         }
