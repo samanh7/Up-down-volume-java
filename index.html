@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>کنترل صدا با تشخیص گفتار</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>کنترل صدا با تشخیص گفتار</h1>
+        <div class="status">
+            <div class="status-indicator" id="micStatus"></div>
+            <span id="statusText">در حال راه‌اندازی...</span>
+        </div>
+        <div class="volume-display">
+            <div class="volume-bar">
+                <div class="volume-level" id="volumeLevel"></div>
+            </div>
+            <span id="volumeValue">50%</span>
+        </div>
+        <div class="instructions">
+            <p>دستورات صوتی:</p>
+            <ul>
+                <li><strong>"up"</strong> - افزایش صدا</li>
+                <li><strong>"down"</strong> - کاهش صدا</li>
+            </ul>
+        </div>
+        <div class="log" id="commandLog"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
